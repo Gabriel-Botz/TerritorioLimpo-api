@@ -61,13 +61,13 @@ class OcorrenciaRepositoryTest {
 		Ocorrencia reloaded = repository.findById(id).orElseThrow();
 
 		assertThat(reloaded.getNumero()).isNotNull().isPositive();
-		assertThat(reloaded.getStatus()).isEqualTo(OcorrenciaStatus.RECEBIDA);
+		assertThat(reloaded.getSituacao()).isEqualTo(OcorrenciaStatus.RECEBIDA);
 		assertThat(reloaded.getPrioridade()).isEqualTo(NivelPrioridade.ALTA);
-		assertThat(reloaded.getPrioridadeReasons())
+		assertThat(reloaded.getMotivosPrioridade())
 				.containsExactly("DRENAGEM_COM_RISCO", "POSSIVEL_OBSTRUCAO", "VOLUME_GRANDE",
 						"ACESSO_IMPOSSIVEL_CAMINHAO");
-		assertThat(reloaded.getCreatedAt()).isNotNull();
-		assertThat(reloaded.getUpdatedAt()).isNotNull();
+		assertThat(reloaded.getCriadoEm()).isNotNull();
+		assertThat(reloaded.getAtualizadoEm()).isNotNull();
 	}
 
 	@Test
@@ -81,13 +81,13 @@ class OcorrenciaRepositoryTest {
 		ocorrencia.setRiscoDrenagem(RiscoDrenagem.NAO);
 		ocorrencia.setOrigemLocalizacao(territorio_limpo_api.ocorrencia.OrigemLocalizacao.MANUAL);
 		ocorrencia.setTextoEndereco("Rua Exemplo, 100");
-		ocorrencia.setClientRequestId(requestId);
+		ocorrencia.setIdRequisicaoCliente(requestId);
 
 		repository.saveAndFlush(ocorrencia);
 
-		assertThat(repository.findByClientRequestId(requestId)).isPresent()
+		assertThat(repository.findByIdRequisicaoCliente(requestId)).isPresent()
 				.get()
-				.extracting(Ocorrencia::getClientRequestId)
+				.extracting(Ocorrencia::getIdRequisicaoCliente)
 				.isEqualTo(requestId);
 	}
 }

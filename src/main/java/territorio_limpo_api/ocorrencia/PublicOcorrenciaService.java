@@ -69,7 +69,7 @@ public class PublicOcorrenciaService {
 	public CreationResult create(PublicOcorrenciaRequest request, List<MultipartFile> fotos,
 			UUID idempotencyKey) {
 		if (idempotencyKey != null) {
-			Optional<Ocorrencia> existing = ocorrenciaRepository.findByClientRequestId(idempotencyKey);
+			Optional<Ocorrencia> existing = ocorrenciaRepository.findByIdRequisicaoCliente(idempotencyKey);
 			if (existing.isPresent()) {
 				return new CreationResult(replay(existing.get()), true);
 			}
@@ -116,16 +116,16 @@ public class PublicOcorrenciaService {
 		int failed = received - saved;
 		OcorrenciaCreatedResponse response = new OcorrenciaCreatedResponse(
 				stored.getNumero(),
-				stored.getCreatedAt(),
+				stored.getCriadoEm(),
 				data.localizacaoSummary(),
-				stored.getStatus(),
+				stored.getSituacao(),
 				new OcorrenciaCreatedResponse.FotoSummary(received, saved, failed),
 				messageFor(failed));
 		return new CreationResult(response, false);
 	}
 
 	public Optional<OcorrenciaCreatedResponse> findReplay(UUID idempotencyKey) {
-		return ocorrenciaRepository.findByClientRequestId(idempotencyKey).map(this::replay);
+		return ocorrenciaRepository.findByIdRequisicaoCliente(idempotencyKey).map(this::replay);
 	}
 
 	private Ocorrencia buildOcorrencia(UUID id, PublicOcorrenciaRequest request, NormalizedData data,
@@ -139,7 +139,7 @@ public class PublicOcorrenciaService {
 		ocorrencia.setTextoEndereco(data.addressText());
 		ocorrencia.setPontoReferencia(data.referenciaPoint());
 		ocorrencia.setPrecisaoMetros(data.precisaoMeters());
-		ocorrencia.setClientRequestId(idempotencyKey);
+		ocorrencia.setIdRequisicaoCliente(idempotencyKey);
 
 		if (request.hasCoordinates()) {
 			ocorrencia.setLatitude(coordinates(request.latitude()));
@@ -224,9 +224,9 @@ public class PublicOcorrenciaService {
 		int savedFotos = (int) fotoRepository.countByOcorrenciaId(ocorrencia.getId());
 		return new OcorrenciaCreatedResponse(
 				ocorrencia.getNumero(),
-				ocorrencia.getCreatedAt(),
+				ocorrencia.getCriadoEm(),
 				localizacaoSummary(ocorrencia.getTextoEndereco(), ocorrencia.getPontoReferencia()),
-				ocorrencia.getStatus(),
+				ocorrencia.getSituacao(),
 				new OcorrenciaCreatedResponse.FotoSummary(savedFotos, savedFotos, 0),
 				RECEIVED_MESSAGE);
 	}

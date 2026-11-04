@@ -45,7 +45,7 @@ public class OcorrenciaEncaminhamento {
 	private String encaminhadoPor;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createdAt;
+	private Instant criadoEm;
 
 	protected OcorrenciaEncaminhamento() {
 	}
@@ -60,7 +60,7 @@ public class OcorrenciaEncaminhamento {
 		encaminhamento.numeroProtocolo = numeroProtocolo;
 		encaminhamento.textoSolicitacao = textoSolicitacao;
 		encaminhamento.encaminhadoPor = encaminhadoPor;
-		encaminhamento.createdAt = now;
+		encaminhamento.criadoEm = now;
 		return encaminhamento;
 	}
 
@@ -92,7 +92,7 @@ public class OcorrenciaEncaminhamento {
 		return encaminhadoPor;
 	}
 
-	public Instant getCreatedAt() {
-		return createdAt;
+	public Instant getCriadoEm() {
+		return criadoEm;
 	}
 }

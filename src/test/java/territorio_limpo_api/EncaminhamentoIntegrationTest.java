@@ -109,7 +109,7 @@ class EncaminhamentoIntegrationTest {
 						"SOLICITAÇÃO DE COLETA")));
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
-		assertThat(reloaded.getStatus()).isEqualTo(OcorrenciaStatus.RECEBIDA);
+		assertThat(reloaded.getSituacao()).isEqualTo(OcorrenciaStatus.RECEBIDA);
 		assertThat(encaminhamentoRepository.findByOcorrenciaIdOrderByEncaminhadoEmDesc(ocorrencia.getId())).hasSize(1);
 	}
 

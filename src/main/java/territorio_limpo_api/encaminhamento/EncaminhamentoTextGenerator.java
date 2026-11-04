@@ -24,7 +24,7 @@ public class EncaminhamentoTextGenerator {
 		StringBuilder text = new StringBuilder();
 		text.append("SOLICITAÇÃO DE COLETA — Território Limpo\n");
 		text.append("Registro nº ").append(ocorrencia.getNumero()).append(" — registrado em ")
-				.append(DATE_TIME.format(ocorrencia.getCreatedAt().atZone(SAO_PAULO))).append("\n\n");
+				.append(DATE_TIME.format(ocorrencia.getCriadoEm().atZone(SAO_PAULO))).append("\n\n");
 
 		appendLine(text, "Tipo de resíduo", ocorrencia.getTipo().label());
 		appendLine(text, "Volume estimado", ocorrencia.getVolumeEstimado().label());

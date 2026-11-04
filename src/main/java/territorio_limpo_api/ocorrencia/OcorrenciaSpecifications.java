@@ -21,7 +21,7 @@ public final class OcorrenciaSpecifications {
 			List<Predicate> predicates = new ArrayList<>();
 
 			if (filter.status() != null) {
-				predicates.add(builder.equal(root.get("status"), filter.status()));
+				predicates.add(builder.equal(root.get("situacao"), filter.status()));
 			}
 			if (filter.type() != null) {
 				predicates.add(builder.equal(root.get("tipo"), filter.type()));
@@ -38,11 +38,11 @@ public final class OcorrenciaSpecifications {
 				}
 			}
 			if (filter.from() != null) {
-				predicates.add(builder.greaterThanOrEqualTo(root.get("createdAt"),
+				predicates.add(builder.greaterThanOrEqualTo(root.get("criadoEm"),
 						filter.from().atStartOfDay(SAO_PAULO).toInstant()));
 			}
 			if (filter.to() != null) {
-				predicates.add(builder.lessThan(root.get("createdAt"),
+				predicates.add(builder.lessThan(root.get("criadoEm"),
 						filter.to().plusDays(1).atStartOfDay(SAO_PAULO).toInstant()));
 			}
 			if (NormalizadorTexto.hasText(filter.query())) {

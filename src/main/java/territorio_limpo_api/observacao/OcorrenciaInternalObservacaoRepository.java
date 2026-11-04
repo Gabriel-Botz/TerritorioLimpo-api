@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OcorrenciaInternalObservacaoRepository extends JpaRepository<OcorrenciaInternalObservacao, Long> {
 
-	List<OcorrenciaInternalObservacao> findByOcorrenciaIdOrderByCreatedAtAsc(UUID ocorrenciaId);
+	List<OcorrenciaInternalObservacao> findByOcorrenciaIdOrderByCriadoEmAsc(UUID ocorrenciaId);
 }

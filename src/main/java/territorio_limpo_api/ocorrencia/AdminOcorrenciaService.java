@@ -75,7 +75,7 @@ public class AdminOcorrenciaService {
 
 	@Transactional(readOnly = true)
 	public PaginaResponse<AdminOcorrenciaListItem> list(AdminOcorrenciaFilter filter, int page, int size) {
-		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "criadoEm"));
 		Page<Ocorrencia> ocorrencias = ocorrenciaRepository.findAll(OcorrenciaSpecifications.from(filter),
 				pageable);
 		Map<UUID, Long> fotoCounts = fotoCounts(ocorrencias.getContent());
@@ -99,7 +99,7 @@ public class AdminOcorrenciaService {
 	@Transactional
 	public AdminOcorrenciaDetail changeStatus(UUID id, StatusChangeRequest request, String adminId) {
 		Ocorrencia ocorrencia = lock(id);
-		OcorrenciaStatus from = ocorrencia.getStatus();
+		OcorrenciaStatus from = ocorrencia.getSituacao();
 		OcorrenciaStatus to = request.status();
 		if (from == to) {
 			throw Excecoes.conflict("A ocorrência já está nesta situação.");
@@ -122,10 +122,10 @@ public class AdminOcorrenciaService {
 						"Informe o motivo para reabrir uma ocorrência já resolvida.");
 			}
 			ocorrencia.clearResolution();
-			ocorrencia.setStatus(to);
+			ocorrencia.setSituacao(to);
 		}
 		else {
-			ocorrencia.setStatus(to);
+			ocorrencia.setSituacao(to);
 		}
 
 		ocorrencia.touch(now);
@@ -145,8 +145,8 @@ public class AdminOcorrenciaService {
 	@Transactional
 	public AdminOcorrenciaDetail changeVulneravelArea(UUID id, VulneravelAreaRequest request) {
 		Ocorrencia ocorrencia = lock(id);
-		ocorrencia.setInVulneravelArea(request.inVulneravelArea());
-		if (!ocorrencia.isPrioridadeSetManually()) {
+		ocorrencia.setEmAreaVulneravel(request.inVulneravelArea());
+		if (!ocorrencia.isPrioridadeDefinidaManualmente()) {
 			PrioridadeResult result = PrioridadeCalculator.calculate(ocorrencia.getTipo(),
 					ocorrencia.getVolumeEstimado(), ocorrencia.getAcessoColeta(),
 					ocorrencia.getRiscoDrenagem(), Boolean.TRUE.equals(request.inVulneravelArea()));
@@ -176,7 +176,7 @@ public class AdminOcorrenciaService {
 		OcorrenciaInternalObservacao observacao = observacaoRepository.save(OcorrenciaInternalObservacao.create(ocorrencia, adminId,
 				normalizeRequired(request.body(), "body"), now));
 		return new AdminOcorrenciaDetail.ObservacaoView(observacao.getId(), observacao.getAutorId(), observacao.getCorpo(),
-				observacao.getCreatedAt());
+				observacao.getCriadoEm());
 	}
 
 	@Transactional
@@ -199,8 +199,8 @@ public class AdminOcorrenciaService {
 
 		fotoRepository.delete(foto);
 		Instant now = clock.instant();
-		historicoRepository.save(OcorrenciaStatusHistorico.create(ocorrencia, ocorrencia.getStatus(),
-				ocorrencia.getStatus(), adminId, "Uma foto foi removida pela equipe.", now));
+		historicoRepository.save(OcorrenciaStatusHistorico.create(ocorrencia, ocorrencia.getSituacao(),
+				ocorrencia.getSituacao(), adminId, "Uma foto foi removida pela equipe.", now));
 		ocorrencia.touch(now);
 	}
 
@@ -220,14 +220,14 @@ public class AdminOcorrenciaService {
 		return new AdminOcorrenciaListItem(
 				ocorrencia.getId(),
 				ocorrencia.getNumero(),
-				ocorrencia.getCreatedAt(),
+				ocorrencia.getCriadoEm(),
 				ocorrencia.getTipo(),
 				ocorrencia.getVolumeEstimado(),
 				ocorrencia.getAcessoColeta(),
 				ocorrencia.getRiscoDrenagem(),
-				ocorrencia.getStatus(),
+				ocorrencia.getSituacao(),
 				ocorrencia.getPrioridade(),
-				ocorrencia.isPrioridadeSetManually(),
+				ocorrencia.isPrioridadeDefinidaManualmente(),
 				ocorrencia.getTextoEndereco(),
 				ocorrencia.getPontoReferencia(),
 				ocorrencia.getLatitude() != null,
@@ -237,7 +237,7 @@ public class AdminOcorrenciaService {
 	private AdminOcorrenciaDetail toDetail(Ocorrencia ocorrencia, List<AdminOcorrenciaDetail.FotoView> fotos) {
 		List<AdminOcorrenciaDetail.HistoricoView> historico = historicoRepository
 				.findByOcorrenciaIdOrderByAlteradoEmAsc(ocorrencia.getId()).stream()
-				.map(item -> new AdminOcorrenciaDetail.HistoricoView(item.getStatusAnterior(), item.getStatusNovo(),
+				.map(item -> new AdminOcorrenciaDetail.HistoricoView(item.getSituacaoAnterior(), item.getSituacaoNova(),
 						item.getAlteradoPor(), item.getObservacao(), item.getAlteradoEm()))
 				.toList();
 
@@ -247,12 +247,12 @@ public class AdminOcorrenciaService {
 				.toList();
 
 		List<AdminOcorrenciaDetail.ObservacaoView> observacaos = observacaoRepository
-				.findByOcorrenciaIdOrderByCreatedAtAsc(ocorrencia.getId()).stream()
+				.findByOcorrenciaIdOrderByCriadoEmAsc(ocorrencia.getId()).stream()
 				.map(observacao -> new AdminOcorrenciaDetail.ObservacaoView(observacao.getId(), observacao.getAutorId(),
-						observacao.getCorpo(), observacao.getCreatedAt()))
+						observacao.getCorpo(), observacao.getCriadoEm()))
 				.toList();
 
-		List<AdminOcorrenciaDetail.PrioridadeReasonView> reasons = ocorrencia.getPrioridadeReasons().stream()
+		List<AdminOcorrenciaDetail.PrioridadeReasonView> reasons = ocorrencia.getMotivosPrioridade().stream()
 				.map(code -> {
 					PrioridadeReason reason = PrioridadeReason.fromCode(code);
 					return new AdminOcorrenciaDetail.PrioridadeReasonView(code,
@@ -263,8 +263,8 @@ public class AdminOcorrenciaService {
 		return new AdminOcorrenciaDetail(
 				ocorrencia.getId(),
 				ocorrencia.getNumero(),
-				ocorrencia.getCreatedAt(),
-				ocorrencia.getUpdatedAt(),
+				ocorrencia.getCriadoEm(),
+				ocorrencia.getAtualizadoEm(),
 				ocorrencia.getTipo(),
 				ocorrencia.getVolumeEstimado(),
 				ocorrencia.getAcessoColeta(),
@@ -276,15 +276,15 @@ public class AdminOcorrenciaService {
 				ocorrencia.getTextoEndereco(),
 				ocorrencia.getPontoReferencia(),
 				ocorrencia.getOrigemLocalizacao(),
-				ocorrencia.getStatus(),
+				ocorrencia.getSituacao(),
 				ocorrencia.getPrioridade(),
 				reasons,
-				ocorrencia.isPrioridadeSetManually(),
-				ocorrencia.getManualPrioridadeReason(),
-				ocorrencia.getInVulneravelArea(),
-				ocorrencia.getResolvedAt(),
-				ocorrencia.getResolvedConfirmedBy(),
-				ocorrencia.getResolutionObservacao(),
+				ocorrencia.isPrioridadeDefinidaManualmente(),
+				ocorrencia.getMotivoPrioridadeManual(),
+				ocorrencia.getEmAreaVulneravel(),
+				ocorrencia.getResolvidaEm(),
+				ocorrencia.getConfirmadaPor(),
+				ocorrencia.getObservacaoResolucao(),
 				historico,
 				encaminhamentos,
 				observacaos,
@@ -294,14 +294,14 @@ public class AdminOcorrenciaService {
 	private AdminOcorrenciaDetail.EncaminhamentoView toEncaminhamentoView(OcorrenciaEncaminhamento encaminhamento) {
 		return new AdminOcorrenciaDetail.EncaminhamentoView(encaminhamento.getId(), encaminhamento.getDestino(),
 				encaminhamento.getCanal(), encaminhamento.getEncaminhadoEm(), encaminhamento.getNumeroProtocolo(),
-				encaminhamento.getTextoSolicitacao(), encaminhamento.getEncaminhadoPor(), encaminhamento.getCreatedAt());
+				encaminhamento.getTextoSolicitacao(), encaminhamento.getEncaminhadoPor(), encaminhamento.getCriadoEm());
 	}
 
 	private List<AdminOcorrenciaDetail.FotoView> fotoViews(Ocorrencia ocorrencia) {
 		List<AdminOcorrenciaDetail.FotoView> views = new ArrayList<>();
-		for (OcorrenciaFoto foto : fotoRepository.findByOcorrenciaIdOrderByCreatedAtAsc(ocorrencia.getId())) {
+		for (OcorrenciaFoto foto : fotoRepository.findByOcorrenciaIdOrderByCriadoEmAsc(ocorrencia.getId())) {
 			views.add(new AdminOcorrenciaDetail.FotoView(foto.getId(), signedUrlOrNull(foto),
-					foto.getCreatedAt()));
+					foto.getCriadoEm()));
 		}
 		return views;
 	}

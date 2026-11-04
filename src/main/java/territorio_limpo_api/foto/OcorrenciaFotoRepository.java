@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface OcorrenciaFotoRepository extends JpaRepository<OcorrenciaFoto, UUID> {
 
-	List<OcorrenciaFoto> findByOcorrenciaIdOrderByCreatedAtAsc(UUID ocorrenciaId);
+	List<OcorrenciaFoto> findByOcorrenciaIdOrderByCriadoEmAsc(UUID ocorrenciaId);
 
 	long countByOcorrenciaId(UUID ocorrenciaId);
 

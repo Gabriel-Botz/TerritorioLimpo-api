@@ -13,7 +13,7 @@ import jakarta.persistence.LockModeType;
 
 public interface OcorrenciaRepository extends JpaRepository<Ocorrencia, UUID>, JpaSpecificationExecutor<Ocorrencia> {
 
-	Optional<Ocorrencia> findByClientRequestId(UUID clientRequestId);
+	Optional<Ocorrencia> findByIdRequisicaoCliente(UUID idRequisicaoCliente);
 
 	Optional<Ocorrencia> findByNumero(Long number);
 

@@ -33,7 +33,7 @@ public class OcorrenciaInternalObservacao {
 	private String corpo;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createdAt;
+	private Instant criadoEm;
 
 	protected OcorrenciaInternalObservacao() {
 	}
@@ -43,7 +43,7 @@ public class OcorrenciaInternalObservacao {
 		observacao.ocorrencia = ocorrencia;
 		observacao.autorId = autorId;
 		observacao.corpo = corpo;
-		observacao.createdAt = now;
+		observacao.criadoEm = now;
 		return observacao;
 	}
 
@@ -59,7 +59,7 @@ public class OcorrenciaInternalObservacao {
 		return corpo;
 	}
 
-	public Instant getCreatedAt() {
-		return createdAt;
+	public Instant getCriadoEm() {
+		return criadoEm;
 	}
 }
