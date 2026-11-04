@@ -1,0 +1,8 @@
+app:
+  rate-limit:
+    enabled: false
+  turnstile:
+    enabled: false
+  storage:
+    supabase-url: ""
+    service-key: ""
