@@ -79,7 +79,7 @@ class IndicadorIntegrationTest {
 			ocorrencia.markResolved(Instant.now(), "admin-1", "Coleta confirmada.");
 		}
 		else {
-			ocorrencia.setStatus(status);
+			ocorrencia.setSituacao(status);
 		}
 		return ocorrenciaRepository.saveAndFlush(ocorrencia);
 	}

@@ -34,7 +34,7 @@ public class OcorrenciaFoto {
 	private long tamanhoBytes;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createdAt;
+	private Instant criadoEm;
 
 	protected OcorrenciaFoto() {
 	}
@@ -47,7 +47,7 @@ public class OcorrenciaFoto {
 		foto.caminhoStorage = caminhoStorage;
 		foto.tipoConteudo = tipoConteudo;
 		foto.tamanhoBytes = tamanhoBytes;
-		foto.createdAt = now;
+		foto.criadoEm = now;
 		return foto;
 	}
 
@@ -71,7 +71,7 @@ public class OcorrenciaFoto {
 		return tamanhoBytes;
 	}
 
-	public Instant getCreatedAt() {
-		return createdAt;
+	public Instant getCriadoEm() {
+		return criadoEm;
 	}
 }

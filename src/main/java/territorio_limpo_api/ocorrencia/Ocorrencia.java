@@ -30,10 +30,10 @@ public class Ocorrencia {
 	private Long numero;
 
 	@Column(name = "created_at", nullable = false, updatable = false)
-	private Instant createdAt;
+	private Instant criadoEm;
 
 	@Column(name = "updated_at", nullable = false)
-	private Instant updatedAt;
+	private Instant atualizadoEm;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, length = 30)
@@ -75,7 +75,7 @@ public class Ocorrencia {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 30)
-	private OcorrenciaStatus status;
+	private OcorrenciaStatus situacao;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "prioridade", nullable = false, length = 10)
@@ -83,28 +83,28 @@ public class Ocorrencia {
 
 	@JdbcTypeCode(SqlTypes.ARRAY)
 	@Column(name = "prioridade_reasons", nullable = false, columnDefinition = "text[]")
-	private List<String> prioridadeReasons = new ArrayList<>();
+	private List<String> motivosPrioridade = new ArrayList<>();
 
 	@Column(name = "prioridade_set_manually", nullable = false)
-	private boolean prioridadeSetManually;
+	private boolean prioridadeDefinidaManualmente;
 
 	@Column(name = "manual_prioridade_reason", length = 500)
-	private String manualPrioridadeReason;
+	private String motivoPrioridadeManual;
 
 	@Column(name = "in_vulneravel_area")
-	private Boolean inVulneravelArea;
+	private Boolean emAreaVulneravel;
 
 	@Column(name = "client_request_id")
-	private UUID clientRequestId;
+	private UUID idRequisicaoCliente;
 
 	@Column(name = "resolved_at")
-	private Instant resolvedAt;
+	private Instant resolvidaEm;
 
 	@Column(name = "resolved_confirmed_by", length = 255)
-	private String resolvedConfirmedBy;
+	private String confirmadaPor;
 
 	@Column(name = "resolution_observacao", length = 2000)
-	private String resolutionObservacao;
+	private String observacaoResolucao;
 
 	protected Ocorrencia() {
 	}
@@ -112,39 +112,39 @@ public class Ocorrencia {
 	public static Ocorrencia create(UUID id, Instant now) {
 		Ocorrencia ocorrencia = new Ocorrencia();
 		ocorrencia.id = id;
-		ocorrencia.createdAt = now;
-		ocorrencia.updatedAt = now;
-		ocorrencia.status = OcorrenciaStatus.RECEBIDA;
+		ocorrencia.criadoEm = now;
+		ocorrencia.atualizadoEm = now;
+		ocorrencia.situacao = OcorrenciaStatus.RECEBIDA;
 		return ocorrencia;
 	}
 
 	public void applyPrioridade(PrioridadeResult result) {
 		this.prioridade = result.level();
-		this.prioridadeReasons = result.reasons().stream().map(PrioridadeReason::name).toList();
-		this.prioridadeSetManually = false;
+		this.motivosPrioridade = result.reasons().stream().map(PrioridadeReason::name).toList();
+		this.prioridadeDefinidaManualmente = false;
 	}
 
 	public void applyManualPrioridade(NivelPrioridade level, String reason) {
 		this.prioridade = level;
-		this.prioridadeSetManually = true;
-		this.manualPrioridadeReason = reason;
+		this.prioridadeDefinidaManualmente = true;
+		this.motivoPrioridadeManual = reason;
 	}
 
-	public void markResolved(Instant now, String confirmedBy, String observacao) {
-		this.status = OcorrenciaStatus.RESOLVIDA;
-		this.resolvedAt = now;
-		this.resolvedConfirmedBy = confirmedBy;
-		this.resolutionObservacao = observacao;
+	public void markResolved(Instant now, String confirmadaPor, String observacao) {
+		this.situacao = OcorrenciaStatus.RESOLVIDA;
+		this.resolvidaEm = now;
+		this.confirmadaPor = confirmadaPor;
+		this.observacaoResolucao = observacao;
 	}
 
 	public void clearResolution() {
-		this.resolvedAt = null;
-		this.resolvedConfirmedBy = null;
-		this.resolutionObservacao = null;
+		this.resolvidaEm = null;
+		this.confirmadaPor = null;
+		this.observacaoResolucao = null;
 	}
 
 	public void touch(Instant now) {
-		this.updatedAt = now;
+		this.atualizadoEm = now;
 	}
 
 	public UUID getId() {
@@ -155,12 +155,12 @@ public class Ocorrencia {
 		return numero;
 	}
 
-	public Instant getCreatedAt() {
-		return createdAt;
+	public Instant getCriadoEm() {
+		return criadoEm;
 	}
 
-	public Instant getUpdatedAt() {
-		return updatedAt;
+	public Instant getAtualizadoEm() {
+		return atualizadoEm;
 	}
 
 	public OcorrenciaType getTipo() {
@@ -251,55 +251,55 @@ public class Ocorrencia {
 		this.origemLocalizacao = origemLocalizacao;
 	}
 
-	public OcorrenciaStatus getStatus() {
-		return status;
+	public OcorrenciaStatus getSituacao() {
+		return situacao;
 	}
 
-	public void setStatus(OcorrenciaStatus status) {
-		this.status = status;
+	public void setSituacao(OcorrenciaStatus situacao) {
+		this.situacao = situacao;
 	}
 
 	public NivelPrioridade getPrioridade() {
 		return prioridade;
 	}
 
-	public List<String> getPrioridadeReasons() {
-		return prioridadeReasons == null ? List.of() : List.copyOf(prioridadeReasons);
+	public List<String> getMotivosPrioridade() {
+		return motivosPrioridade == null ? List.of() : List.copyOf(motivosPrioridade);
 	}
 
-	public boolean isPrioridadeSetManually() {
-		return prioridadeSetManually;
+	public boolean isPrioridadeDefinidaManualmente() {
+		return prioridadeDefinidaManualmente;
 	}
 
-	public String getManualPrioridadeReason() {
-		return manualPrioridadeReason;
+	public String getMotivoPrioridadeManual() {
+		return motivoPrioridadeManual;
 	}
 
-	public Boolean getInVulneravelArea() {
-		return inVulneravelArea;
+	public Boolean getEmAreaVulneravel() {
+		return emAreaVulneravel;
 	}
 
-	public void setInVulneravelArea(Boolean inVulneravelArea) {
-		this.inVulneravelArea = inVulneravelArea;
+	public void setEmAreaVulneravel(Boolean emAreaVulneravel) {
+		this.emAreaVulneravel = emAreaVulneravel;
 	}
 
-	public UUID getClientRequestId() {
-		return clientRequestId;
+	public UUID getIdRequisicaoCliente() {
+		return idRequisicaoCliente;
 	}
 
-	public void setClientRequestId(UUID clientRequestId) {
-		this.clientRequestId = clientRequestId;
+	public void setIdRequisicaoCliente(UUID idRequisicaoCliente) {
+		this.idRequisicaoCliente = idRequisicaoCliente;
 	}
 
-	public Instant getResolvedAt() {
-		return resolvedAt;
+	public Instant getResolvidaEm() {
+		return resolvidaEm;
 	}
 
-	public String getResolvedConfirmedBy() {
-		return resolvedConfirmedBy;
+	public String getConfirmadaPor() {
+		return confirmadaPor;
 	}
 
-	public String getResolutionObservacao() {
-		return resolutionObservacao;
+	public String getObservacaoResolucao() {
+		return observacaoResolucao;
 	}
 }

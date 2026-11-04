@@ -111,8 +111,8 @@ class PublicOcorrenciaIntegrationTest {
 
 		Ocorrencia ocorrencia = ocorrenciaRepository.findAll().getFirst();
 		assertThat(ocorrencia.getOrigemLocalizacao()).isEqualTo(OrigemLocalizacao.MANUAL);
-		assertThat(ocorrencia.getStatus().name()).isEqualTo("RECEBIDA");
-		assertThat(ocorrencia.getClientRequestId()).isNull();
+		assertThat(ocorrencia.getSituacao().name()).isEqualTo("RECEBIDA");
+		assertThat(ocorrencia.getIdRequisicaoCliente()).isNull();
 		assertThat(historicoRepository.findByOcorrenciaIdOrderByAlteradoEmAsc(ocorrencia.getId())).hasSize(1);
 	}
 

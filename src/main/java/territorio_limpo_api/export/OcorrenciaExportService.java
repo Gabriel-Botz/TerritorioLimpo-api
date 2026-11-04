@@ -96,7 +96,7 @@ public class OcorrenciaExportService {
 			Page<Ocorrencia> page;
 			do {
 				page = ocorrenciaRepository.findAll(specification,
-						PageRequest.of(pageNumber, 500, Sort.by(Sort.Direction.ASC, "createdAt")));
+						PageRequest.of(pageNumber, 500, Sort.by(Sort.Direction.ASC, "criadoEm")));
 				for (Ocorrencia ocorrencia : page.getContent()) {
 					print(printer, ocorrencia,
 							fotoCounts.getOrDefault(ocorrencia.getId(), 0L),
@@ -114,14 +114,14 @@ public class OcorrenciaExportService {
 		try {
 			printer.printRecord(
 					ocorrencia.getNumero(),
-					DATE_TIME.format(ocorrencia.getCreatedAt().atZone(SAO_PAULO)),
+					DATE_TIME.format(ocorrencia.getCriadoEm().atZone(SAO_PAULO)),
 					TextoCsv.neutralize(ocorrencia.getTipo().label()),
 					TextoCsv.neutralize(ocorrencia.getVolumeEstimado().label()),
 					TextoCsv.neutralize(ocorrencia.getAcessoColeta().label()),
 					TextoCsv.neutralize(ocorrencia.getRiscoDrenagem().label()),
-					TextoCsv.neutralize(ocorrencia.getStatus().label()),
+					TextoCsv.neutralize(ocorrencia.getSituacao().label()),
 					TextoCsv.neutralize(ocorrencia.getPrioridade().label()),
-					TextoCsv.neutralize(prioridadeReasons(ocorrencia)),
+					TextoCsv.neutralize(motivosPrioridade(ocorrencia)),
 					TextoCsv.neutralize(ocorrencia.getOrigemLocalizacao().label()),
 					ocorrencia.getLatitude() == null ? "" : ocorrencia.getLatitude().toPlainString(),
 					ocorrencia.getLongitude() == null ? "" : ocorrencia.getLongitude().toPlainString(),
@@ -131,22 +131,22 @@ public class OcorrenciaExportService {
 					fotoCount,
 					encaminhamentoCount,
 					TextoCsv.neutralize(lastProtocol),
-					ocorrencia.getResolvedAt() == null ? ""
-							: DATE_TIME.format(ocorrencia.getResolvedAt().atZone(SAO_PAULO)));
+					ocorrencia.getResolvidaEm() == null ? ""
+							: DATE_TIME.format(ocorrencia.getResolvidaEm().atZone(SAO_PAULO)));
 		}
 		catch (IOException exception) {
 			throw new UncheckedIOException(exception);
 		}
 	}
 
-	private String prioridadeReasons(Ocorrencia ocorrencia) {
-		List<String> labels = ocorrencia.getPrioridadeReasons().stream()
+	private String motivosPrioridade(Ocorrencia ocorrencia) {
+		List<String> labels = ocorrencia.getMotivosPrioridade().stream()
 				.map(PrioridadeReason::fromCode)
 				.filter(reason -> reason != null)
 				.map(PrioridadeReason::label)
 				.toList();
-		if (labels.isEmpty() && NormalizadorTexto.hasText(ocorrencia.getManualPrioridadeReason())) {
-			return ocorrencia.getManualPrioridadeReason();
+		if (labels.isEmpty() && NormalizadorTexto.hasText(ocorrencia.getMotivoPrioridadeManual())) {
+			return ocorrencia.getMotivoPrioridadeManual();
 		}
 		return String.join("; ", labels);
 	}

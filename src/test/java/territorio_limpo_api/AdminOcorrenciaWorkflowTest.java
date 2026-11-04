@@ -91,12 +91,12 @@ class AdminOcorrenciaWorkflowTest {
 				""", 200);
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
-		assertThat(reloaded.getStatus()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
+		assertThat(reloaded.getSituacao()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
 		assertThat(historicoRepository.findByOcorrenciaIdOrderByAlteradoEmAsc(ocorrencia.getId()))
 				.singleElement()
 				.satisfies(historico -> {
-					assertThat(historico.getStatusAnterior()).isEqualTo(OcorrenciaStatus.RECEBIDA);
-					assertThat(historico.getStatusNovo()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
+					assertThat(historico.getSituacaoAnterior()).isEqualTo(OcorrenciaStatus.RECEBIDA);
+					assertThat(historico.getSituacaoNova()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
 					assertThat(historico.getAlteradoPor()).isEqualTo("admin-1");
 				});
 	}
@@ -131,10 +131,10 @@ class AdminOcorrenciaWorkflowTest {
 				""", 200);
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
-		assertThat(reloaded.getStatus()).isEqualTo(OcorrenciaStatus.RESOLVIDA);
-		assertThat(reloaded.getResolvedAt()).isNotNull();
-		assertThat(reloaded.getResolvedConfirmedBy()).isEqualTo("admin-1");
-		assertThat(reloaded.getResolutionObservacao()).isNotBlank();
+		assertThat(reloaded.getSituacao()).isEqualTo(OcorrenciaStatus.RESOLVIDA);
+		assertThat(reloaded.getResolvidaEm()).isNotNull();
+		assertThat(reloaded.getConfirmadaPor()).isEqualTo("admin-1");
+		assertThat(reloaded.getObservacaoResolucao()).isNotBlank();
 	}
 
 	@Test
@@ -154,10 +154,10 @@ class AdminOcorrenciaWorkflowTest {
 				""", 200);
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
-		assertThat(reloaded.getStatus()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
-		assertThat(reloaded.getResolvedAt()).isNull();
-		assertThat(reloaded.getResolvedConfirmedBy()).isNull();
-		assertThat(reloaded.getResolutionObservacao()).isNull();
+		assertThat(reloaded.getSituacao()).isEqualTo(OcorrenciaStatus.EM_ANALISE);
+		assertThat(reloaded.getResolvidaEm()).isNull();
+		assertThat(reloaded.getConfirmadaPor()).isNull();
+		assertThat(reloaded.getObservacaoResolucao()).isNull();
 	}
 
 	@Test
@@ -177,8 +177,8 @@ class AdminOcorrenciaWorkflowTest {
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
 		assertThat(reloaded.getPrioridade()).isEqualTo(NivelPrioridade.ALTA);
-		assertThat(reloaded.isPrioridadeSetManually()).isTrue();
-		assertThat(reloaded.getManualPrioridadeReason()).isEqualTo("Risco observado pela equipe.");
+		assertThat(reloaded.isPrioridadeDefinidaManualmente()).isTrue();
+		assertThat(reloaded.getMotivoPrioridadeManual()).isEqualTo("Risco observado pela equipe.");
 	}
 
 	@Test
@@ -196,8 +196,8 @@ class AdminOcorrenciaWorkflowTest {
 				.andExpect(jsonPath("$.prioridade").value("MEDIA"));
 
 		Ocorrencia reloaded = ocorrenciaRepository.findById(ocorrencia.getId()).orElseThrow();
-		assertThat(reloaded.getInVulneravelArea()).isTrue();
+		assertThat(reloaded.getEmAreaVulneravel()).isTrue();
 		assertThat(reloaded.getPrioridade()).isEqualTo(NivelPrioridade.MEDIA);
-		assertThat(reloaded.getPrioridadeReasons()).contains("AREA_VULNERAVEL_VERIFICADA");
+		assertThat(reloaded.getMotivosPrioridade()).contains("AREA_VULNERAVEL_VERIFICADA");
 	}
 }

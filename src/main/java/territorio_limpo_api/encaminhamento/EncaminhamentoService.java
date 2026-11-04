@@ -58,7 +58,7 @@ public class EncaminhamentoService {
 
 		return new AdminOcorrenciaDetail.EncaminhamentoView(encaminhamento.getId(), encaminhamento.getDestino(),
 				encaminhamento.getCanal(), encaminhamento.getEncaminhadoEm(), encaminhamento.getNumeroProtocolo(),
-				encaminhamento.getTextoSolicitacao(), encaminhamento.getEncaminhadoPor(), encaminhamento.getCreatedAt());
+				encaminhamento.getTextoSolicitacao(), encaminhamento.getEncaminhadoPor(), encaminhamento.getCriadoEm());
 	}
 
 	private Ocorrencia find(UUID ocorrenciaId) {

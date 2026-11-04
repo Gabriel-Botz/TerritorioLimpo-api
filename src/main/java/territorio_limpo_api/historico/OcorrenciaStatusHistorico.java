@@ -31,11 +31,11 @@ public class OcorrenciaStatusHistorico {
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "from_status", length = 30)
-	private OcorrenciaStatus statusAnterior;
+	private OcorrenciaStatus situacaoAnterior;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "to_status", nullable = false, length = 30)
-	private OcorrenciaStatus statusNovo;
+	private OcorrenciaStatus situacaoNova;
 
 	@Column(name = "changed_by", length = 255)
 	private String alteradoPor;
@@ -49,12 +49,12 @@ public class OcorrenciaStatusHistorico {
 	protected OcorrenciaStatusHistorico() {
 	}
 
-	public static OcorrenciaStatusHistorico create(Ocorrencia ocorrencia, OcorrenciaStatus statusAnterior,
-			OcorrenciaStatus statusNovo, String alteradoPor, String observacao, Instant now) {
+	public static OcorrenciaStatusHistorico create(Ocorrencia ocorrencia, OcorrenciaStatus situacaoAnterior,
+			OcorrenciaStatus situacaoNova, String alteradoPor, String observacao, Instant now) {
 		OcorrenciaStatusHistorico historico = new OcorrenciaStatusHistorico();
 		historico.ocorrencia = ocorrencia;
-		historico.statusAnterior = statusAnterior;
-		historico.statusNovo = statusNovo;
+		historico.situacaoAnterior = situacaoAnterior;
+		historico.situacaoNova = situacaoNova;
 		historico.alteradoPor = alteradoPor;
 		historico.observacao = observacao;
 		historico.alteradoEm = now;
@@ -65,12 +65,12 @@ public class OcorrenciaStatusHistorico {
 		return id;
 	}
 
-	public OcorrenciaStatus getStatusAnterior() {
-		return statusAnterior;
+	public OcorrenciaStatus getSituacaoAnterior() {
+		return situacaoAnterior;
 	}
 
-	public OcorrenciaStatus getStatusNovo() {
-		return statusNovo;
+	public OcorrenciaStatus getSituacaoNova() {
+		return situacaoNova;
 	}
 
 	public String getAlteradoPor() {
